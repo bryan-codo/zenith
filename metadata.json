@@ -1,0 +1,5 @@
+{
+  "name": "Zenith Health OS",
+  "description": "A modern, minimalist healthcare management dashboard. Features include patient record management, appointments, prescriptions, an interactive dashboard with a daily agenda and analytics, and public health monitoring.",
+  "requestFramePermissions": []
+}
