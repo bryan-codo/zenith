@@ -31,9 +31,9 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patient, onBack }) => {
   const [radiology, setRadiology] = useState<RadiologyImage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Type assertion for JSONB columns
+  // Type assertion for JSONB columns - FIX: Insurance is a single object, not array
   const demographics = patient.demographics as unknown as Demographics | null;
-  const insurance = patient.insurance as unknown as Insurance[] | null;
+  const insurance = patient.insurance as unknown as Insurance | null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,12 +91,16 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patient, onBack }) => {
                     <div className="col-span-2"><InfoItem label="Address" value={demographics?.address} /></div>
                 </div>
                  <h4 className="font-semibold pt-4 mt-4 border-t border-gray-200">Insurance</h4>
-                    {insurance?.map(ins => (
-                        <div key={ins.policyNumber} className="grid grid-cols-2 gap-4 mt-2">
-                             <InfoItem label="Provider" value={ins.provider} />
-                             <InfoItem label="Policy #" value={ins.policyNumber} />
+                    {insurance ? (
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                             <InfoItem label="Provider" value={insurance.provider} />
+                             <InfoItem label="Policy #" value={insurance.policyNumber} />
+                             <InfoItem label="Group #" value={insurance.groupNumber} />
+                             <InfoItem label="Primary" value={insurance.isPrimary ? 'Yes' : 'No'} />
                         </div>
-                    ))}
+                    ) : (
+                        <p className="text-sm text-gray-500 mt-2">No insurance information available.</p>
+                    )}
             </DetailSection>
             
             <DetailSection title="Ancillary Data" icon={BeakerIcon}>
@@ -122,28 +126,27 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ patient, onBack }) => {
             <DetailSection title="Electronic Health Record (EHR)" icon={ClipboardIcon}>
                 {!ehr ? <p className="text-sm text-gray-500">No EHR data available for this patient.</p> : (
                     <div className="space-y-6 text-sm">
-                        {/* Note: In a real app, you would parse and display the JSONB data more robustly */}
                         <div>
                             <h4 className="font-semibold text-base mb-2">Allergies</h4>
                             <div className="flex flex-wrap gap-2">
-                               {ehr.allergies?.map(a => <span key={a} className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">{a}</span>)}
+                               {ehr.allergies && ehr.allergies.length > 0 ? ehr.allergies.map(a => <span key={a} className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">{a}</span>) : <span className="text-gray-500">None recorded</span>}
                             </div>
                         </div>
                         <div>
                             <h4 className="font-semibold text-base mb-2">Medical History</h4>
-                            <p>{ehr.medical_history?.join(', ')}</p>
+                            <p>{ehr.medical_history && ehr.medical_history.length > 0 ? ehr.medical_history.join(', ') : 'None recorded'}</p>
                         </div>
                         <div>
                             <h4 className="font-semibold text-base mb-2">Diagnoses</h4>
-                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{JSON.stringify(ehr.diagnoses, null, 2)}</pre>
+                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{ehr.diagnoses ? JSON.stringify(ehr.diagnoses, null, 2) : 'None recorded'}</pre>
                         </div>
                          <div>
                             <h4 className="font-semibold text-base mb-2">Medications</h4>
-                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{JSON.stringify(ehr.medications, null, 2)}</pre>
+                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{ehr.medications ? JSON.stringify(ehr.medications, null, 2) : 'None recorded'}</pre>
                         </div>
                         <div>
                             <h4 className="font-semibold text-base mb-2">Clinical Notes</h4>
-                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{JSON.stringify(ehr.notes, null, 2)}</pre>
+                            <pre className="text-xs bg-gray-50 p-2 rounded-md whitespace-pre-wrap">{ehr.notes ? JSON.stringify(ehr.notes, null, 2) : 'None recorded'}</pre>
                         </div>
                     </div>
                 )}

@@ -44,3 +44,18 @@ export interface PublicHealthStat {
     value: string;
     trend: 'up' | 'down' | 'stable';
 }
+
+export interface Profile {
+    id: string;
+    full_name: string | null;
+    title: string | null; // M.D., D.O., etc.
+    specialty: string | null;
+    hospital: string | null;
+    contact_phone: string | null;
+    email: string | null;
+    experience_years: number | null;
+    bio: string | null;
+    avatar_url: string | null;
+    created_at: string;
+    updated_at: string;
+}
